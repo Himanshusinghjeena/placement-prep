@@ -16,4 +16,43 @@ model User {
   year      Int?
   cgpa      Float?
   createdAt DateTime @default(now())
+
+  solvedProblems UserProblem[]
+}
+
+model Problem {
+  id          String   @id @default(cuid())
+  title       String
+  difficulty  String
+  tags        String[]
+  companies   String[]
+  leetcodeUrl String
+  createdAt   DateTime @default(now())
+
+  solvedBy UserProblem[]
+}
+
+model UserProblem {
+  id        String   @id @default(cuid())
+  userId    String
+  problemId String
+  solved    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  problem Problem @relation(fields: [problemId], references: [id])
+
+  @@unique([userId, problemId])
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  type      String
+  ctc       Float
+  minCgpa   Float
+  date      String
+  branches  String[]
+  rounds    String[]
+  createdAt DateTime @default(now())
 }
