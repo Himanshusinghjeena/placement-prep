@@ -1,33 +1,34 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 
 const difficulties = ["All", "Easy", "Medium", "Hard"];
+
 
 export default function ProblemsPage() {
   const [problems, setProblems] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [company, setCompany] = useState("All Companies");
   const [search, setSearch] = useState("");
   const [solved, setSolved] = useState<string[]>([]);
 
   useEffect(() => {
-    // Problems fetch karo
     fetch("/api/problems")
       .then((res) => res.json())
       .then((data) => setProblems(data));
 
-    // Solved problems fetch karo
     fetch("/api/problems/solved")
       .then((res) => res.json())
       .then((data) => setSolved(data.map((p: any) => p.problemId)));
   }, []);
 
   const filtered = problems.filter((p: any) => {
-    const matchDiff = filter === "All" || p.difficulty === filter;
-    const matchSearch = p.title.toLowerCase().includes(search.toLowerCase());
-    return matchDiff && matchSearch;
-  });
+  const matchDiff = filter === 'All' || p.difficulty === filter
+  const matchSearch = 
+    p.title.toLowerCase().includes(search.toLowerCase()) ||
+    p.companies.some((c: string) => c.toLowerCase().includes(search.toLowerCase()))
+  return matchDiff && matchSearch
+})
 
   const toggleSolved = async (problemId: string) => {
     setSolved((prev) =>
@@ -53,13 +54,13 @@ export default function ProblemsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3 mb-6 flex-wrap">
+      <div className="flex items-center gap-3 mb-4 flex-wrap">
         <input
           type="text"
-          placeholder="Search problems..."
+          placeholder="🔍 Search problems or company..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500 w-64"
+          className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500 w-72"
         />
         {difficulties.map((d) => (
           <button
@@ -75,6 +76,13 @@ export default function ProblemsPage() {
           </button>
         ))}
       </div>
+
+      
+
+      {/* Results count */}
+      <p className="text-gray-500 text-sm mb-4">
+        {filtered.length} problems found
+      </p>
 
       {/* Problems Table */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
@@ -94,9 +102,6 @@ export default function ProblemsPage() {
                 Difficulty
               </th>
               <th className="text-left text-gray-400 text-sm font-medium p-4">
-                Tags
-              </th>
-              <th className="text-left text-gray-400 text-sm font-medium p-4">
                 Companies
               </th>
             </tr>
@@ -104,7 +109,7 @@ export default function ProblemsPage() {
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center text-gray-500 py-12">
+                <td colSpan={5} className="text-center text-gray-500 py-12">
                   No problems found
                 </td>
               </tr>
@@ -154,24 +159,13 @@ export default function ProblemsPage() {
                   </td>
                   <td className="p-4">
                     <div className="flex gap-1 flex-wrap">
-                      {problem.tags.slice(0, 2).map((tag: string) => (
+                      {problem.companies.slice(0, 3).map((c: string) => (
                         <span
-                          key={tag}
-                          className="px-2 py-0.5 bg-gray-800 text-gray-400 text-xs rounded"
+                          key={c}
+                          onClick={() => setCompany(c)}
+                          className="px-2 py-0.5 bg-purple-900 text-purple-400 text-xs rounded cursor-pointer hover:bg-purple-800"
                         >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex gap-1 flex-wrap">
-                      {problem.companies.slice(0, 2).map((company: string) => (
-                        <span
-                          key={company}
-                          className="px-2 py-0.5 bg-blue-900 text-blue-400 text-xs rounded"
-                        >
-                          {company}
+                          {c}
                         </span>
                       ))}
                     </div>

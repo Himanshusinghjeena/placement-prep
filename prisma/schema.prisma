@@ -15,6 +15,9 @@ model User {
   branch    String?
   year      Int?
   cgpa      Float?
+  role      String   @default("student") 
+  quizAttempts QuizAttempt[]
+  companyInterests CompanyInterest[]
   createdAt DateTime @default(now())
 
   solvedProblems UserProblem[]
@@ -46,13 +49,81 @@ model UserProblem {
 }
 
 model Company {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  type        String
+  ctc         Float
+  minCgpa     Float
+  date        String
+  branches    String[]
+  rounds      String[]
+  description String?
+  website     String?
+  location    String?
+  employees   String?
+  createdAt   DateTime @default(now())
+
+  interests CompanyInterest[]
+}
+
+model CompanyInterest {
+  id            String   @id @default(cuid())
+  userId        String
+  companyId     String
+  status        String   @default("registered") // registered, round1, round2, selected, rejected
+  currentRound  Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@unique([userId, companyId])
+}
+
+
+model Quiz {
+  id       String     @id @default(cuid())
+  title    String
+  category String
+  duration Int
+  createdAt DateTime  @default(now())
+
+  questions Question[]
+  attempts  QuizAttempt[]
+}
+
+model Question {
+  id            String   @id @default(cuid())
+  quizId        String
+  question      String
+  options       String[]
+  correctIndex  Int
+  explanation   String?
+  createdAt     DateTime @default(now())
+
+  quiz Quiz @relation(fields: [quizId], references: [id])
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  quizId      String
+  score       Int
+  totalQ      Int
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  quiz Quiz @relation(fields: [quizId], references: [id])
+}
+
+
+
+
+model StudyMaterial {
   id        String   @id @default(cuid())
-  name      String   @unique
-  type      String
-  ctc       Float
-  minCgpa   Float
-  date      String
-  branches  String[]
-  rounds    String[]
+  subject   String   // "OS", "DBMS", "CN"
+  topic     String
+  content   String
+  order     Int      @default(0)
   createdAt DateTime @default(now())
 }
