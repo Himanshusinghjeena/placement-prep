@@ -116,7 +116,7 @@ export default async function CompanyDetailPage({
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
               <h2 className="font-bold text-lg mb-4">Placement Process</h2>
               <div className="flex flex-col gap-3">
-                {company.rounds.map((round, index) => {
+                {company.rounds.map((round: string, index: number) => {
                   const isCurrentRound = userInterest && userInterest.currentRound === index
                   const isCleared = userInterest && userInterest.currentRound > index
                   const isRejected = userInterest?.status === 'rejected'
