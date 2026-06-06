@@ -160,7 +160,7 @@ export default async function CompanyDetailPage({
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
               <h2 className="font-bold text-lg mb-4">Eligible Branches</h2>
               <div className="flex gap-2 flex-wrap">
-                {company.branches.map(branch => (
+                {company.branches.map((branch: string) => (
                   <span key={branch} className="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300">
                     {branch}
                   </span>
