@@ -25,7 +25,7 @@ export default async function DashboardPage() {
   if (!user) redirect('/')
 
   const totalPoints = (user._count.solvedProblems * 10) + 
-    (user.quizAttempts.reduce((sum, a) => sum + a.score, 0) * 5)
+    (user.quizAttempts.reduce((sum: number, a: any) => sum + a.score, 0) * 5)
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
