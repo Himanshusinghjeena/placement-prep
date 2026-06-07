@@ -6,7 +6,7 @@ const adapter = new PrismaNeon({
 })
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined
+  prisma: any
 }
 
 export const db =

@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
 }
 
 datasource db {
@@ -16,6 +16,7 @@ model User {
   year      Int?
   cgpa      Float?
   role      String   @default("student") 
+  resumeUrl String?
   quizAttempts QuizAttempt[]
   companyInterests CompanyInterest[]
   notifications Notification[]

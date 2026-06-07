@@ -10,8 +10,8 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-black">
       <Sidebar />
-      <div className="flex-1 flex flex-col ml-60">
-        <header className="flex justify-end items-center p-4 gap-4 h-16 bg-black border-b border-gray-800 sticky top-0 z-10">
+      <div className="flex-1 flex flex-col lg:ml-60">
+        <header className="flex justify-end items-center p-4 gap-4 h-16 bg-black border-b border-gray-800 sticky top-0 z-10 pl-14 lg:pl-4">
           <NotificationBell />
           <Show when="signed-out">
             <SignInButton mode="modal">

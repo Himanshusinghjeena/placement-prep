@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
   if (students.length > 0) {
     await db.notification.createMany({
-      data: students.map(student => ({
+      data: students.map((student: { id: string }) => ({
         userId: student.id,
         title: '🏢 New Placement Drive!',
         message: `${company.name} is hiring! CTC: ₹${company.ctc} LPA. Check eligibility and register now.`,

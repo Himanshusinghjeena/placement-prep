@@ -39,7 +39,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-gray-900 border border-gray-800 rounded-xl p-4">
           <p className="text-gray-400 text-sm">College</p>
           <p className="text-white font-semibold mt-1">{user.college || 'Not set'}</p>
@@ -60,7 +60,7 @@ export default async function DashboardPage() {
 
       {/* Modules */}
       <h2 className="text-xl font-bold mb-4">Modules</h2>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Link href="/problems">
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 cursor-pointer hover:border-blue-500 transition-colors">
             <div className="text-3xl mb-3">💻</div>

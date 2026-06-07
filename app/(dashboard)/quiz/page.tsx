@@ -18,7 +18,7 @@ export default function QuizPage() {
         <p className="text-gray-400 mt-1">Test your skills and track your progress</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {quizzes.map((quiz: any) => (
           <div
             key={quiz.id}

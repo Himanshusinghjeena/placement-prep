@@ -86,7 +86,8 @@ export default function ProblemsPage() {
 
       {/* Problems Table */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <table className="w-full">
+        <div className="overflow-x-auto">
+  <table className="w-full min-w-[600px]">
           <thead>
             <tr className="border-b border-gray-800">
               <th className="text-left text-gray-400 text-sm font-medium p-4 w-12">
@@ -175,6 +176,7 @@ export default function ProblemsPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

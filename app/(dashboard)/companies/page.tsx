@@ -50,7 +50,7 @@ export default function CompaniesPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 mb-6">
+      <div className="flex gap-2 mb-6 flex-wrap">
         {['All', 'Product', 'Service', 'Startup'].map(f => (
           <button
             key={f}
@@ -67,7 +67,7 @@ export default function CompaniesPage() {
       </div>
 
       {/* Companies Grid */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.length === 0 ? (
           <p className="text-gray-500 col-span-3 text-center py-20">No drives posted yet</p>
         ) : (

@@ -19,9 +19,11 @@ export default async function LeaderboardPage() {
     orderBy: { createdAt: 'asc' }
   })
 
+  type LeaderboardUser = Awaited<ReturnType<typeof db.user.findMany>>[number]
+
   // Points calculate karo
-  const ranked = users.map(user => {
-    const totalQuizScore = user.quizAttempts.reduce((sum, a) => sum + a.score, 0)
+  const ranked = users.map((user: LeaderboardUser) => {
+    const totalQuizScore = user.quizAttempts.reduce((sum: number, a: { score: number }) => sum + a.score, 0)
     const problemPoints = user._count.solvedProblems * 10
     const quizPoints = totalQuizScore * 5
     const totalPoints = problemPoints + quizPoints
@@ -36,7 +38,7 @@ export default async function LeaderboardPage() {
       quizzesTaken: user._count.quizAttempts,
       totalPoints,
     }
-  }).sort((a, b) => b.totalPoints - a.totalPoints)
+  }).sort((a: { totalPoints: number }, b: { totalPoints: number }): number => b.totalPoints - a.totalPoints)
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
@@ -49,7 +51,7 @@ export default async function LeaderboardPage() {
 
       {/* Top 3 */}
       {ranked.length >= 3 && (
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           {[ranked[1], ranked[0], ranked[2]].map((user, i) => {
             const actualRank = i === 0 ? 2 : i === 1 ? 1 : 3
             const colors = ['silver', 'gold', 'bronze'] as const
@@ -75,7 +77,8 @@ export default async function LeaderboardPage() {
 
       {/* Full Table */}
       <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-        <table className="w-full">
+  <div className="overflow-x-auto">
+  <table className="w-full min-w-[600px]">
           <thead>
             <tr className="border-b border-gray-800">
               <th className="text-left text-gray-400 text-sm font-medium p-4">Rank</th>
@@ -87,7 +90,7 @@ export default async function LeaderboardPage() {
             </tr>
           </thead>
           <tbody>
-            {ranked.map((user, index) => (
+            {ranked.map((user: typeof ranked[number], index: number) => (
               <tr
                 key={user.id}
                 className={`border-b border-gray-800 transition-colors ${
@@ -136,6 +139,7 @@ export default async function LeaderboardPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   )
