@@ -1,8 +1,13 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { auth } from '@clerk/nextjs/server'
 
 export default async function Home() {
   const { userId } = await auth()
+
+  if (userId) {
+    redirect('/dashboard')
+  }
 
   return (
     <div className="min-h-screen bg-[#0A0C10] text-white">
