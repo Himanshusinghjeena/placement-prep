@@ -1,6 +1,13 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let resend: Resend | null = null
+
+const getResend = () => {
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY)
+  }
+  return resend
+}
 
 export async function sendNewDriveEmail(
   emails: string[],
@@ -15,7 +22,7 @@ export async function sendNewDriveEmail(
   if (emails.length === 0) return
 
   const emailPromises = emails.map(email =>
-    resend.emails.send({
+    getResend().emails.send({
       from: 'PlacePrep <onboarding@resend.dev>',
       to: email,
       subject: `🏢 New Placement Drive — ${company.name}!`,
