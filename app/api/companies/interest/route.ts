@@ -14,27 +14,49 @@ export async function POST(req: Request) {
 
     const existing = await db.companyInterest.findUnique({
       where: {
-        userId_companyId: {
-          userId: user.id,
-          companyId
-        }
+        userId_companyId: { userId: user.id, companyId }
       }
     })
 
     if (existing) {
       await db.companyInterest.delete({
         where: {
-          userId_companyId: {
-            userId: user.id,
-            companyId
-          }
+          userId_companyId: { userId: user.id, companyId }
         }
       })
+
+      // Group se bhi hatao
+      const group = await db.group.findUnique({ where: { companyId } })
+      if (group) {
+        await db.groupMember.deleteMany({
+          where: { groupId: group.id, userId: user.id }
+        })
+      }
+
       return NextResponse.json({ registered: false })
     }
 
     await db.companyInterest.create({
       data: { userId: user.id, companyId }
+    })
+
+    // Group dhundho ya banao
+    let group = await db.group.findUnique({ where: { companyId } })
+    if (!group) {
+      const company = await db.company.findUnique({ where: { id: companyId } })
+      group = await db.group.create({
+        data: {
+          companyId,
+          name: `${company?.name} — Placement Drive`
+        }
+      })
+    }
+
+    // Student ko group mein add karo
+    await db.groupMember.upsert({
+      where: { groupId_userId: { groupId: group.id, userId: user.id } },
+      update: {},
+      create: { groupId: group.id, userId: user.id }
     })
 
     return NextResponse.json({ registered: true })
@@ -52,7 +74,7 @@ export async function GET() {
     const user = await db.user.findUnique({ where: { clerkId: userId } })
     if (!user) return NextResponse.json([])
 
-    const interests = await db.companyInterest.findMany({
+    const interests: { companyId: string }[] = await db.companyInterest.findMany({
       where: { userId: user.id }
     })
 

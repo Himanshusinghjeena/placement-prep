@@ -1,148 +1,153 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react'
+import { useToast } from '@/components/ui/toast'
+import { StudySkeleton } from '@/components/ui/skeleton'
 
 const subjects = [
-  { key: "OS", label: "Operating System", icon: "🖥️" },
-  { key: "DBMS", label: "Database Management", icon: "🗄️" },
-  { key: "CN", label: "Computer Networks", icon: "🌐" },
-];
+  { key: 'OS',   label: 'Operating System',      icon: 'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' },
+  { key: 'DBMS', label: 'Database Management',   icon: 'M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4' },
+  { key: 'CN',   label: 'Computer Networks',     icon: 'M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9' },
+]
+
+function formatContent(content: string) {
+  return content.split('\n').map((line, i) => {
+    if (line.startsWith('**') && line.endsWith('**')) {
+      return <p key={i} className="font-semibold text-white mt-4 mb-1.5 text-sm">{line.replace(/\*\*/g, '')}</p>
+    }
+    if (line.startsWith('- ')) {
+      return (
+        <li key={i} className="text-gray-400 ml-4 list-disc text-sm leading-relaxed">
+          {line.replace('- ', '').replace(/\*\*(.*?)\*\*/g, '$1')}
+        </li>
+      )
+    }
+    if (line.startsWith('```')) return null
+    if (line.trim() === '') return <div key={i} className="h-1.5" />
+    return <p key={i} className="text-gray-400 text-sm leading-relaxed">{line.replace(/\*\*(.*?)\*\*/g, '$1')}</p>
+  })
+}
 
 export default function StudyPage() {
-  const [activeTab, setActiveTab] = useState("OS");
-  const [materials, setMaterials] = useState<any[]>([]);
-  const [openTopic, setOpenTopic] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const toast = useToast()
+  const [activeTab, setActiveTab]   = useState('OS')
+  const [materials, setMaterials]   = useState<any[]>([])
+  const [openTopic, setOpenTopic]   = useState<string | null>(null)
+  const [tabLoading, setTabLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(true);
-    setOpenTopic(null);
-
+    setTabLoading(true)
+    setOpenTopic(null)
     fetch(`/api/study?subject=${activeTab}`)
-      .then(async (res) => {
-        // 1. Check if the response status is 2xx
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        // 2. Read the text first to prevent empty-body JSON errors
-        const text = await res.text();
-        return text ? JSON.parse(text) : [];
+      .then(async res => {
+        if (!res.ok) throw new Error()
+        const text = await res.text()
+        return text ? JSON.parse(text) : []
       })
-      .then((data) => {
-        setMaterials(data);
-        setLoading(false);
+      .then(data => {
+        setMaterials(data)
+        setTabLoading(false)
       })
-      .catch((error) => {
-        console.error("Failed to fetch materials:", error);
-        setMaterials([]); // Set an empty array as a fallback
-        setLoading(false);
-      });
-  }, [activeTab]);
-
-  const formatContent = (content: string) => {
-    return content.split("\n").map((line, i) => {
-      if (line.startsWith("**") && line.endsWith("**")) {
-        return (
-          <p key={i} className="font-semibold text-white mt-3 mb-1">
-            {line.replace(/\*\*/g, "")}
-          </p>
-        );
-      }
-      if (line.startsWith("- ")) {
-        return (
-          <li key={i} className="text-gray-300 ml-4 list-disc">
-            {line.replace("- ", "").replace(/\*\*(.*?)\*\*/g, "$1")}
-          </li>
-        );
-      }
-      if (line.startsWith("```")) {
-        return null;
-      }
-      if (line.trim() === "") return <br key={i} />;
-      return (
-        <p key={i} className="text-gray-300 text-sm leading-relaxed">
-          {line.replace(/\*\*(.*?)\*\*/g, "$1")}
-        </p>
-      );
-    });
-  };
+      .catch(() => {
+        toast('Failed to load materials', 'error')
+        setMaterials([])
+        setTabLoading(false)
+      })
+  }, [activeTab])
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-[#080b11] text-white p-6 md:p-8">
+
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Study Materials 📚</h1>
-        <p className="text-gray-400 mt-1">Core subjects for SDE interviews</p>
+      <div className="mb-7">
+        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Study Materials</h1>
+        <p className="text-gray-500 text-sm mt-1.5">Core subjects for SDE interviews</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-8 border-b border-gray-800 pb-0 overflow-x-auto">
-        {subjects.map((subject) => (
+      <div className="flex gap-1 mb-7 bg-gray-900/60 border border-gray-800/80 rounded-2xl p-1 w-fit">
+        {subjects.map(s => (
           <button
-            key={subject.key}
-            onClick={() => setActiveTab(subject.key)}
-            className={`flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors border-b-2 -mb-px ${
-              activeTab === subject.key
-                ? "border-blue-500 text-blue-400"
-                : "border-transparent text-gray-400 hover:text-white"
+            key={s.key}
+            onClick={() => setActiveTab(s.key)}
+            className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium rounded-xl transition-all duration-150 ${
+              activeTab === s.key
+                ? 'bg-blue-600/20 text-blue-400 border border-blue-500/25 shadow-sm'
+                : 'text-gray-500 hover:text-gray-300'
             }`}
           >
-            <span>{subject.icon}</span>
-            <span>{subject.label}</span>
+            <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth={1.7} stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" d={s.icon} />
+            </svg>
+            <span className="hidden sm:inline">{s.label}</span>
+            <span className="sm:hidden">{s.key}</span>
           </button>
         ))}
       </div>
 
       {/* Content */}
-      {loading ? (
-        <div className="text-center py-20 text-gray-500">Loading...</div>
-      ) : (
-        <div className="max-w-3xl w-full">
-          <p className="text-gray-500 text-sm mb-4">
-            {materials.length} topics
-          </p>
-          <div className="flex flex-col gap-3">
-            {materials.map((material, index) => (
-              <div
-                key={material.id}
-                className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden"
-              >
-                {/* Accordion Header */}
-                <button
-                  onClick={() =>
-                    setOpenTopic(openTopic === material.id ? null : material.id)
-                  }
-                  className="w-full flex items-center justify-between p-5 text-left hover:bg-gray-800 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-blue-500 font-bold text-sm w-6">
-                      {index + 1}
-                    </span>
-                    <span className="font-medium text-white">
-                      {material.topic}
-                    </span>
-                  </div>
-                  <span
-                    className={`text-gray-400 transition-transform ${openTopic === material.id ? "rotate-180" : ""}`}
-                  >
-                    ▼
-                  </span>
-                </button>
-
-                {/* Accordion Content */}
-                {openTopic === material.id && (
-                  <div className="px-5 pb-5 border-t border-gray-800 pt-4">
-                    <div className="space-y-1">
-                      {formatContent(material.content)}
-                    </div>
-                  </div>
-                )}
+      {tabLoading ? (
+        <div className="max-w-3xl flex flex-col gap-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-gray-900/50 border border-gray-800/80 rounded-2xl p-5 flex items-center justify-between animate-pulse">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="h-4 w-5 bg-gray-800 rounded" />
+                <div className="h-4 bg-gray-800 rounded w-48" />
               </div>
-            ))}
+              <div className="h-4 w-4 bg-gray-800 rounded" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="max-w-3xl">
+          <p className="text-gray-600 text-xs mb-4">{materials.length} topics</p>
+          <div className="flex flex-col gap-2">
+            {materials.map((material, index) => {
+              const isOpen = openTopic === material.id
+              return (
+                <div
+                  key={material.id}
+                  className={`bg-gray-900/50 border rounded-2xl overflow-hidden transition-all duration-200 ${
+                    isOpen ? 'border-blue-500/25' : 'border-gray-800/80 hover:border-gray-700'
+                  }`}
+                >
+                  <button
+                    onClick={() => setOpenTopic(isOpen ? null : material.id)}
+                    className="w-full flex items-center justify-between p-5 text-left group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-blue-500/70 font-bold text-xs w-5 tabular-nums">{index + 1}</span>
+                      <span className="font-medium text-gray-200 text-sm group-hover:text-white transition-colors">
+                        {material.topic}
+                      </span>
+                    </div>
+                    <svg
+                      className={`w-4 h-4 text-gray-600 transition-transform duration-200 shrink-0 ml-3 ${isOpen ? 'rotate-180 text-blue-400' : ''}`}
+                      fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-5 pb-5 border-t border-gray-800/60 pt-4">
+                      <div className="space-y-0.5">
+                        {formatContent(material.content)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+
+            {materials.length === 0 && (
+              <div className="text-center py-16 text-gray-600 text-sm">
+                No materials available for this subject
+              </div>
+            )}
           </div>
         </div>
       )}
     </div>
-  );
+  )
 }
